@@ -13,7 +13,7 @@ from tqdm.auto import tqdm
 
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-TEST_IMAGE_PATH = "./archive/test/angie/002.jpg"
+TEST_IMAGE_PATH = "./archive/test/paler/002.jpg"
 
 
 # Create the classifier model.
@@ -126,7 +126,7 @@ def loss_function(model, images, labels):
     test_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
     # How many times the model sees all images in the training data set and does forward back pass.
-    num_epochs = 20
+    num_epochs = 8
     train_losses, val_losses = [], []
 
     # Set pytorch to use the gpu rather than cpu.

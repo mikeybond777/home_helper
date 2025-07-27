@@ -36,31 +36,33 @@ def crop_to_key_face(source_image_path, key_face_image_path, output_image_path, 
         # Find the matching face in the source image
         match_found = False
         for i, source_face_encoding in enumerate(source_face_encodings):
-            # Compare faces
+            # If only 1 face detected we can assume it is the correct person (most likely)!
+            #if len(source_face_encodings) != 1:
             matches = face_recognition.compare_faces([key_face_encoding], source_face_encoding)
+            if not matches[0]:
+                continue
 
-            if matches[0]:
-                print("Match found!")
-                # Get the coordinates of the matched face
-                top, right, bottom, left = source_face_locations[i]
+            print("Match found!")
+            # Get the coordinates of the matched face
+            top, right, bottom, left = source_face_locations[i]
 
-                # Open the original image using Pillow to crop
-                pil_image = Image.open(source_image_path)
+            # Open the original image using Pillow to crop
+            pil_image = Image.open(source_image_path)
 
-                # Define the crop box with padding
-                crop_left = max(0, left - padding)
-                crop_top = max(0, top - padding)
-                crop_right = min(pil_image.width, right + padding)
-                crop_bottom = min(pil_image.height, bottom + padding)
+            # Define the crop box with padding
+            crop_left = max(0, left - padding)
+            crop_top = max(0, top - padding)
+            crop_right = min(pil_image.width, right + padding)
+            crop_bottom = min(pil_image.height, bottom + padding)
 
-                # Crop the image
-                cropped_image = pil_image.crop((crop_left, crop_top, crop_right, crop_bottom))
+            # Crop the image
+            cropped_image = pil_image.crop((crop_left, crop_top, crop_right, crop_bottom))
 
-                # Save the cropped image
-                cropped_image.save(output_image_path)
-                print(f"Cropped image saved to {output_image_path}")
-                match_found = True
-                break  # Exit after finding the first match
+            # Save the cropped image
+            cropped_image.save(output_image_path)
+            print(f"Cropped image saved to {output_image_path}")
+            match_found = True
+            break  # Exit after finding the first match
 
         if not match_found:
             print("Could not find the key face in the source image.")
@@ -176,8 +178,8 @@ def analyse_crop_images():
         key_image_full_path = os.path.abspath('%s/%s' % (KEY_FACES_DIR, key_image))
         face_name = os.path.splitext(key_image)[0]
 
-        if face_name in ['angie', 'bond', 'cameron']:
-            continue
+        #if face_name in ['angie', 'bond', 'cameron']:
+        #    continue
 
         # Ensure key image output dir exists.
         output_dir = os.path.abspath('%s/%s' % (OUTPUT_DIR, face_name))
@@ -246,10 +248,10 @@ def copy_images_for_model_training(output_dir, padding=3):
                 shutil.copy2(image_file_path, new_image_path)
 
 if __name__ == "__main__":
-    #convert_images_to_jpg(os.path.abspath(SOURCE_IMAGES))
-    #convert_images_to_jpg(os.path.abspath(KEY_FACES_DIR))
-    #analyse_crop_images()
-    #reformat_images(os.path.abspath(OUTPUT_DIR))
+    convert_images_to_jpg(os.path.abspath(SOURCE_IMAGES))
+    convert_images_to_jpg(os.path.abspath(KEY_FACES_DIR))
+    analyse_crop_images()
+    reformat_images(os.path.abspath(OUTPUT_DIR))
 
     copy_images_for_model_training(os.path.abspath(OUTPUT_DIR).replace('\\', '/'))
 
